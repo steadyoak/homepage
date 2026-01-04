@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <title>Connecting...</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- 强制防缓存 -->
   <meta http-equiv="cache-control" content="no-store">
   <meta http-equiv="pragma" content="no-cache">
   <meta http-equiv="expires" content="0">
@@ -12,12 +14,13 @@
   <div id="status">Connecting to service…</div>
 
   <script>
+    // ⚠️ 注意：这里必须是 https
     const API = "https://cn-hk-bgp-4.ofalias.net:54048/addr";
     const TIMEOUT = 5000;
 
     async function main() {
       const ctrl = new AbortController();
-      setTimeout(() => ctrl.abort(), TIMEOUT);
+      const timer = setTimeout(() => ctrl.abort(), TIMEOUT);
 
       try {
         const resp = await fetch(API, {
@@ -30,7 +33,7 @@
         }
 
         const data = await resp.json();
-        if (!data.url) {
+        if (!data.url || typeof data.url !== "string") {
           throw new Error("Invalid response");
         }
 
@@ -40,6 +43,8 @@
       } catch (e) {
         document.getElementById("status").textContent =
           "Failed to connect: " + e.message;
+      } finally {
+        clearTimeout(timer);
       }
     }
 
