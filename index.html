@@ -1,28 +1,49 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>正在跳转…</title>
-
-  <!-- 无 JS 也能跳 -->
-  <meta http-equiv="refresh" content="0; url=http://123.185.123.5:36535/" />
-
-  <script>
-    // 有 JS 时用 replace，避免用户点“返回”又回到这个跳转页
-    (function () {
-      var target = "http://123.185.123.5:36535/";
-      if (location.href !== target) location.replace(target);
-    })();
-  </script>
-
-  <style>
-    body { font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif; margin: 24px; color: #111; background:#fff; }
-    a { color: inherit; }
-  </style>
+  <meta charset="utf-8">
+  <title>Connecting...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="cache-control" content="no-store">
+  <meta http-equiv="pragma" content="no-cache">
+  <meta http-equiv="expires" content="0">
 </head>
 <body>
-  <p>正在跳转到：<a href="http://123.185.123.5:36535/">http://123.185.123.5:36535/</a></p>
-  <p>如果没有自动跳转，请点击上面的链接。</p>
+  <div id="status">Connecting to service…</div>
+
+  <script>
+    const API = "http://cn-hk-bgp-4.ofalias.net:54048/addr";
+    const TIMEOUT = 5000;
+
+    async function main() {
+      const ctrl = new AbortController();
+      setTimeout(() => ctrl.abort(), TIMEOUT);
+
+      try {
+        const resp = await fetch(API, {
+          cache: "no-store",
+          signal: ctrl.signal
+        });
+
+        if (!resp.ok) {
+          throw new Error("HTTP " + resp.status);
+        }
+
+        const data = await resp.json();
+        if (!data.url) {
+          throw new Error("Invalid response");
+        }
+
+        // 不保留中转页历史
+        location.replace(data.url);
+
+      } catch (e) {
+        document.getElementById("status").textContent =
+          "Failed to connect: " + e.message;
+      }
+    }
+
+    main();
+  </script>
 </body>
 </html>
