@@ -1,54 +1,13 @@
 <!doctype html>
-<html lang="zh-CN">
+<html>
 <head>
   <meta charset="utf-8">
-  <title>Connecting...</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- 强制防缓存 -->
-  <meta http-equiv="cache-control" content="no-store">
-  <meta http-equiv="pragma" content="no-cache">
-  <meta http-equiv="expires" content="0">
+  <title>Connecting…</title>
 </head>
 <body>
-  <div id="status">Connecting to service…</div>
-
   <script>
-    // ⚠️ 注意：这里必须是 https
-    const API = "https://cn-hk-bgp-4.ofalias.net:54048/addr";
-    const TIMEOUT = 5000;
-
-    async function main() {
-      const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), TIMEOUT);
-
-      try {
-        const resp = await fetch(API, {
-          cache: "no-store",
-          signal: ctrl.signal
-        });
-
-        if (!resp.ok) {
-          throw new Error("HTTP " + resp.status);
-        }
-
-        const data = await resp.json();
-        if (!data.url || typeof data.url !== "string") {
-          throw new Error("Invalid response");
-        }
-
-        // 不保留中转页历史
-        location.replace(data.url);
-
-      } catch (e) {
-        document.getElementById("status").textContent =
-          "Failed to connect: " + e.message;
-      } finally {
-        clearTimeout(timer);
-      }
-    }
-
-    main();
+    // 直接跳，不 fetch
+    location.replace("http://cn-hk-bgp-4.ofalias.net:54048/go");
   </script>
 </body>
 </html>
